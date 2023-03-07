@@ -14,17 +14,25 @@ dp = Dispatcher(bot)
 BASE_PATH = "/home/ureshipan/Yandex.Disk/Color_Study"
 
 # Пример функции, которая обрабатывает команды
-@dp.message_handler(commands=['start', 'help'])
+@dp.message_handler()
 async def send_welcome(message: types.Message):
     """
     This handler will be called when user sends `/start` or `/help` command
     """
+    await message.reply("Привет! Это бот Color Study для сбора информации")
+    startkeyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)#Объявляем варианты ответов для кнопок
+    buttons = ['/start','/about']
+    startkeyboard.add(*buttons)  # Заполняем варианты ответов, распаковывая массив с названиями кнопок
+    await message.answer('Что бы вы хотели сделать?', reply_markup=startkeyboard)
     if message.text == '/start':
-      subprocess.Popen(['/usr/bin/python3', BASE_PATH + "/Current_Run/main.py"])
+        picker = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        buttons = ['Симметрия','Динамика','Колористика']
+        picker.add(*buttons)
+        await message.answer('Что бы вы не хотели оценивать?', reply_markup=picker)
+    if message.text == '/about':
+        await message.answer('*Что-то о Color Study', reply_markup=startkeyboard)
 
-    await message.reply("Hi!\nI'm EchoBot!\nPowered by aiogram.")
-
-
+'''
 @dp.message_handler(commands=['backup_cur'])
 async def backup(message: types.Message):
     subprocess.call("rm -rf " + BASE_PATH + "/Backup/*", shell=True) #Чистим папку
@@ -41,6 +49,7 @@ async def update(message: types.Message):
 @dp.message_handler()
 async def echo(message: types.Message):
     await message.answer(message.text)
+'''
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
