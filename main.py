@@ -1,6 +1,7 @@
 import logging
 import subprocess #Чтобы взаимодействовать с bash консолью линукса
 from aiogram import Bot, Dispatcher, executor, types
+import random, os
 
 API_TOKEN = '6070379081:AAGrYcJlgTrVuoVAeRJjvHZjPwbxqSjfvJI' #тестить здесь @PrjctServerControllerBot
 
@@ -13,6 +14,7 @@ dp = Dispatcher(bot)
 
 BASE_PATH = "/home/ureshipan/Yandex.Disk/Color_Study"
 
+#backupnumber =
 # Пример функции, которая обрабатывает команды
 @dp.message_handler()
 async def send_welcome(message: types.Message):
@@ -24,13 +26,24 @@ async def send_welcome(message: types.Message):
     buttons = ['/start','/about']
     startkeyboard.add(*buttons)  # Заполняем варианты ответов, распаковывая массив с названиями кнопок
     await message.answer('Что бы вы хотели сделать?', reply_markup=startkeyboard)
+    questionNumber = 0
     if message.text == '/start':
         picker = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        buttons = ['Симметрия','Динамика','Колористика']
+        buttons = ['Симметрия','Динамика','Колористика','Отвечу на все']
         picker.add(*buttons)
         await message.answer('Что бы вы не хотели оценивать?', reply_markup=picker)
-    if message.text == '/about':
-        await message.answer('*Что-то о Color Study', reply_markup=startkeyboard)
+        return message.text,questionNumber
+    elif message.text == '/about':
+        await message.answer('*Что-то о Color Study*', reply_markup=startkeyboard)
+
+
+
+@dp.message_handler()
+async def PhotoSender(message: types.Message):
+        photo = open(random.choice([x for x in os.listdir("*Сюда написать путь*")if os.path.isfile(x)]), 'rb')
+        await bot.send_photo(chat_id = message.chat_id, photo=photo)
+
+
 
 '''
 @dp.message_handler(commands=['backup_cur'])
