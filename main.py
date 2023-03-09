@@ -111,7 +111,7 @@ async def send_welcome(message: types.Message):
             picker = types.ReplyKeyboardMarkup(resize_keyboard=True)
             buttons = ["Да", "Нет"]
             picker.add(*buttons)
-            await message.answer('Хотите продолжить?', reply_markup=picker)
+            await message.answer('Спасибо, ваши ответы записаны. Хотите продолжить?', reply_markup=picker)
         else:
             await message.answer(questions["Динамика"]["quest"],
                                 reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
