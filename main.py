@@ -37,6 +37,12 @@ def save_ans(pic_id, param, mean):
     print(pic_id, param, mean)
 
 
+async def continu(pos, ignore):
+    pos += 1
+    if pos == len(questions.keys()) + 1:
+        pos = 0
+    elif questions.keys[pos] == ignore:
+        pos += 1
 @dp.message_handler()
 async def send_welcome(message: types.Message):
     global users_data
@@ -53,7 +59,7 @@ async def send_welcome(message: types.Message):
             #with open('users_data.json') as json_file:     #Добавление юзера в локальный словарь если его нет и перезапись сейва
             #    json.dump(users_data, json_file)
             #    json_file.close()
-        await message.reply("Привет! Это бот Color Study для сбора информации")
+        await message.answer("Привет! Это бот Color Study для сбора информации")
 
         await message.answer('Что бы вы хотели сделать?', reply_markup=startkeyboard)
     elif message.text == '/start_opros':
@@ -62,7 +68,7 @@ async def send_welcome(message: types.Message):
         buttons = ['Симметрия', 'Динамика', 'Колористика', 'Отвечу на все']
         picker.add(*buttons)
         await message.answer('Что бы вы не хотели оценивать?', reply_markup=picker)
-        return message.text
+        #return message.text
     elif message.text == '/about':
         await message.answer('*Что-то о Color Study*', reply_markup=startkeyboard)
 
@@ -73,34 +79,36 @@ async def send_welcome(message: types.Message):
         if message.text in questions.keys():
             users_data[message.from_user.id]["ignore"] = message.text
         pic = InputFile('test_images/' + random.choice([x for x in os.scandir("test_images/")if os.path.isfile(x)]).name)
-        await message.reply_photo(photo=pic, caption="Автор, название, год")
+        #contin = True
+        users_data[message.from_user.id]["position"] = 1
+        await message.answer_photo(photo=pic, caption="Автор, название, год")
+
         #await message.reply(random.choice([x for x in os.scandir("test_images/")if os.path.isfile(x)]).name)
 
-        if users_data[message.from_user.id]["ignore"] != "Композиция":
-            if message.text in questions["Композиция"]["buttons"]:
-                save_ans(users_data[message.from_user.id]["pic_id"], "Композиция", message.text)
-                contin = True
-            else:
-                await message.reply(questions["Композиция"]["quest"],
-                                    reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                        *questions["Композиция"]["buttons"]))
-
+    if users_data[message.from_user.id]["position"] == 1:
+        if message.text in questions["Композиция"]["buttons"]:
+            save_ans(users_data[message.from_user.id]["pic_id"], "Композиция", message.text)
+            #contin = True
+            users_data[message.from_user.id]["position"] = 2
         else:
-            contin = True
+            await message.answer(questions["Композиция"]["quest"],
+                                reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
+                                    *questions["Композиция"]["buttons"]))
 
-    elif users_data[message.from_user.id]["position"] == 1:
+
+    if users_data[message.from_user.id]["position"] == 2:
         if message.text in questions["Динамика"]["buttons"]:
             save_ans(users_data[message.from_user.id]["pic_id"], "Динамика", message.text)
             contin = True
         else:
-            await message.reply(questions["Динамика"]["quest"],
+            await message.answer(questions["Динамика"]["quest"],
                                 reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
                                     *questions["Динамика"]["buttons"]))
 
     # Здесь обработчики всех остальных вопросов по образцу но ещё и с проверкой
     if contin: # Продвижение прогресса пользователя в прогрессе с учётом избегаемых тем
         users_data[message.from_user.id]["position"] += 1
-        if users_data[message.from_user.id]["position"] == len(questions.keys()):
+        if users_data[message.from_user.id]["position"] == len(questions.keys()) + 1:
             users_data[message.from_user.id]["position"] = 0
         elif questions.keys[users_data[message.from_user.id]["position"]] == users_data[message.from_user.id]["ignore"]:
             users_data[message.from_user.id]["position"] += 1
