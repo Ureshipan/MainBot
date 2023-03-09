@@ -37,12 +37,17 @@ def save_ans(pic_id, param, mean):
     print(pic_id, param, mean)
 
 
-async def continu(pos, ignore):
+def continu(pos, ignore):
     pos += 1
-    if pos == len(questions.keys()) + 1:
+    #print(list(questions.keys()), len(list(questions.keys())), pos)
+    if pos == len(list(questions.keys())) + 1:
         pos = 0
-    elif questions.keys[pos] == ignore:
+        #print(pos)
+    elif list(questions.keys())[pos - 1] == ignore:
         pos += 1
+    #print(pos)
+    return pos
+
 @dp.message_handler()
 async def send_welcome(message: types.Message):
     global users_data
@@ -55,32 +60,35 @@ async def send_welcome(message: types.Message):
     """
     if message.text == "/start":
         if message.from_user.id not in users_data.keys():
-            users_data[message.from_user.id] = {"ignore": "Отвечу на всё", "position": 0, "pic_id": -1, "social_rate": 0}
+            users_data[message.from_user.id] = {"ignore": "Отвечу на всё", "position": -1, "pic_id": -1, "social_rate": 0}
             #with open('users_data.json') as json_file:     #Добавление юзера в локальный словарь если его нет и перезапись сейва
             #    json.dump(users_data, json_file)
             #    json_file.close()
         await message.answer("Привет! Это бот Color Study для сбора информации")
 
         await message.answer('Что бы вы хотели сделать?', reply_markup=startkeyboard)
-    elif message.text == '/start_opros':
-
+    elif users_data[message.from_user.id]["position"] == -1 and message.text != '/about':
         picker = types.ReplyKeyboardMarkup(resize_keyboard=True)
         buttons = ['Симметрия', 'Динамика', 'Колористика', 'Отвечу на все']
         picker.add(*buttons)
-        await message.answer('Что бы вы не хотели оценивать?', reply_markup=picker)
+        if message.text in buttons:
+            users_data[message.from_user.id]["ignore"] = message.text
+            users_data[message.from_user.id]["position"] = continu(-1, users_data[message.from_user.id]["ignore"])
+        else:
+            await message.answer('Что бы вы не хотели оценивать?', reply_markup=picker)
         #return message.text
     elif message.text == '/about':
         await message.answer('*Что-то о Color Study*', reply_markup=startkeyboard)
 
+
+
     # Отправка изображения и первый вопрос юзеру. В обработчике следующего вопроса нужно сделать проверку
     # корректности ответа на первый, если первый вопрос вообще задаётся и собственно задать следующий вопрос.
     # contin делать только если ответ на предыдущий вопрос корректен
-    elif users_data[message.from_user.id]["position"] == 0:
-        if message.text in questions.keys():
-            users_data[message.from_user.id]["ignore"] = message.text
+    if users_data[message.from_user.id]["position"] == 0 and message.text != "Нет":
         pic = InputFile('test_images/' + random.choice([x for x in os.scandir("test_images/")if os.path.isfile(x)]).name)
         #contin = True
-        users_data[message.from_user.id]["position"] = 1
+        users_data[message.from_user.id]["position"] = continu(0, users_data[message.from_user.id]["ignore"])
         await message.answer_photo(photo=pic, caption="Автор, название, год")
 
         #await message.reply(random.choice([x for x in os.scandir("test_images/")if os.path.isfile(x)]).name)
@@ -89,7 +97,7 @@ async def send_welcome(message: types.Message):
         if message.text in questions["Композиция"]["buttons"]:
             save_ans(users_data[message.from_user.id]["pic_id"], "Композиция", message.text)
             #contin = True
-            users_data[message.from_user.id]["position"] = 2
+            users_data[message.from_user.id]["position"] = continu(1, users_data[message.from_user.id]["ignore"])
         else:
             await message.answer(questions["Композиция"]["quest"],
                                 reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
@@ -99,7 +107,11 @@ async def send_welcome(message: types.Message):
     if users_data[message.from_user.id]["position"] == 2:
         if message.text in questions["Динамика"]["buttons"]:
             save_ans(users_data[message.from_user.id]["pic_id"], "Динамика", message.text)
-            contin = True
+            users_data[message.from_user.id]["position"] = continu(2, users_data[message.from_user.id]["ignore"])
+            picker = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            buttons = ["Да", "Нет"]
+            picker.add(*buttons)
+            await message.answer('Хотите продолжить?', reply_markup=picker)
         else:
             await message.answer(questions["Динамика"]["quest"],
                                 reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
