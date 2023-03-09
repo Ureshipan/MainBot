@@ -3,6 +3,7 @@ import os
 import json
 import subprocess #Чтобы взаимодействовать с bash консолью линукса
 from aiogram import Bot, Dispatcher, executor, types
+from aiogram.types.input_file import InputFile
 import random, os
 
 API_TOKEN = '6159808536:AAHsRPkSlKgsbPmLsTluqxX-hLHICo9p_dA' #тестить здесь http://t.me/ColorStudyBot
@@ -16,17 +17,19 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 
-# users_data = { "id" : {"ignore" : "Composition", "position" : 0, "pic_id" : 0, "social_rate" : 0}} #Пример оформления
+users_data = { "id" : {"ignore" : "Composition", "position" : 0, "pic_id" : 0, "social_rate" : 0}} #Пример оформления
 
-with open('users_data.json') as json_file: #Загрузка из сейва
-    users_data = json.load(json_file)
-    json_file.close()
+#with open('users_data.json') as json_file: #Загрузка из сейва
+ #   users_data = json.load(json_file)
+ #   json_file.close()
 
 
 questions = { "Композиция" : {"quest" : "На данной картине композиция открытая или закрытая?", "buttons" :["Открытая", "Закрытая"]},
-              "Динамика" : {"quest": "На данной картине композиция динамическая или статическая", "buttons":["Динамическая","Статическая"]},
-              "Метафоры" : {"quest": "На данной картине геометрические фигуры являются метафорой или подложкой", "buttons":["Метафора","Подложка"]},
-              "Фотомонтаж" : {"quest": "На данной картине присутствует фотонмонтаж?", "buttons":["Есть","Отсутствует"]}}
+              "Динамика" : {"quest": "На данной картине композиция динамическая или статическая?", "buttons":["Динамическая","Статическая"]}}
+"""
+              ,
+              "Метафоры" : {"quest": "На данной картине геометрические фигуры являются метафорой или подложкой?", "buttons":["Метафора","Подложка"]},
+              "Фотомонтаж" : {"quest": "На данной картине присутствует фотонмонтаж?", "buttons":["Есть","Отсутствует"]}}"""
 # Пример функции, которая обрабатывает команды
 
 
@@ -47,9 +50,9 @@ async def send_welcome(message: types.Message):
     if message.text == "/start":
         if message.from_user.id not in users_data.keys():
             users_data[message.from_user.id] = {"ignore": "Отвечу на всё", "position": 0, "pic_id": -1, "social_rate": 0}
-            with open('users_data.json') as json_file:     #Добавление юзера в локальный словарь если его нет и перезапись сейва
-                json.dump(users_data, json_file)
-                json_file.close()
+            #with open('users_data.json') as json_file:     #Добавление юзера в локальный словарь если его нет и перезапись сейва
+            #    json.dump(users_data, json_file)
+            #    json_file.close()
         await message.reply("Привет! Это бот Color Study для сбора информации")
 
         await message.answer('Что бы вы хотели сделать?', reply_markup=startkeyboard)
@@ -69,26 +72,39 @@ async def send_welcome(message: types.Message):
     elif users_data[message.from_user.id]["position"] == 0:
         if message.text in questions.keys():
             users_data[message.from_user.id]["ignore"] = message.text
-        await message.reply_photo(open(random.choice([x for x in os.listdir(BASE_PATH + "test_images/")if os.path.isfile(x)]), 'rb'), caption="Автор, название, год")
+        pic = InputFile('test_images/' + random.choice([x for x in os.scandir("test_images/")if os.path.isfile(x)]).name)
+        await message.reply_photo(photo=pic, caption="Автор, название, год")
+        #await message.reply(random.choice([x for x in os.scandir("test_images/")if os.path.isfile(x)]).name)
 
         if users_data[message.from_user.id]["ignore"] != "Композиция":
             if message.text in questions["Композиция"]["buttons"]:
                 save_ans(users_data[message.from_user.id]["pic_id"], "Композиция", message.text)
                 contin = True
             else:
-                await message.reply(questions["Открытая композиция"])
+                await message.reply(questions["Композиция"]["quest"],
+                                    reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
+                                        *questions["Композиция"]["buttons"]))
 
         else:
             contin = True
 
-    # Здесь обработчики всех остальных вопросов по образцу но ещё и с проверкой
+    elif users_data[message.from_user.id]["position"] == 1:
+        if message.text in questions["Динамика"]["buttons"]:
+            save_ans(users_data[message.from_user.id]["pic_id"], "Динамика", message.text)
+            contin = True
+        else:
+            await message.reply(questions["Динамика"]["quest"],
+                                reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
+                                    *questions["Динамика"]["buttons"]))
 
+    # Здесь обработчики всех остальных вопросов по образцу но ещё и с проверкой
     if contin: # Продвижение прогресса пользователя в прогрессе с учётом избегаемых тем
         users_data[message.from_user.id]["position"] += 1
         if users_data[message.from_user.id]["position"] == len(questions.keys()):
             users_data[message.from_user.id]["position"] = 0
-        if questions.keys[users_data[message.from_user.id]["position"]] == users_data[message.from_user.id]["ignore"]:
+        elif questions.keys[users_data[message.from_user.id]["position"]] == users_data[message.from_user.id]["ignore"]:
             users_data[message.from_user.id]["position"] += 1
+
 
 
 
