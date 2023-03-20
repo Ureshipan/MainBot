@@ -25,11 +25,11 @@ users_data = { "id" : {"ignore" : "Composition", "position" : 0, "pic_id" : 0, "
 
 
 questions = { "Композиция" : {"quest" : "На данной картине композиция открытая или закрытая?", "buttons" :["Открытая", "Закрытая"]},
-              "Динамика" : {"quest": "На данной картине композиция динамическая или статическая?", "buttons":["Динамическая","Статическая"]}}
+              "Динамика" : {"quest": "На данной картине композиция динамическая или статическая?", "buttons":["Динамическая","Статическая"]},
+              "Метафоры" : {"quest": "На данной картине геометрические фигуры являются метафорой или сеткой?", "buttons":["Метафора","Сетка"]}}
+""",
+              "Фотомонтаж" : {"quest": "На данной картине присутствует фотонмонтаж?", "buttons":["Есть","Отсутствует"]}}
 """
-              ,
-              "Метафоры" : {"quest": "На данной картине геометрические фигуры являются метафорой или подложкой?", "buttons":["Метафора","Подложка"]},
-              "Фотомонтаж" : {"quest": "На данной картине присутствует фотонмонтаж?", "buttons":["Есть","Отсутствует"]}}"""
 # Пример функции, которая обрабатывает команды
 
 
@@ -108,22 +108,25 @@ async def send_welcome(message: types.Message):
         if message.text in questions["Динамика"]["buttons"]:
             save_ans(users_data[message.from_user.id]["pic_id"], "Динамика", message.text)
             users_data[message.from_user.id]["position"] = continu(2, users_data[message.from_user.id]["ignore"])
-            picker = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            buttons = ["Да", "Нет"]
-            picker.add(*buttons)
-            await message.answer('Спасибо, ваши ответы записаны. Хотите продолжить?', reply_markup=picker)
         else:
             await message.answer(questions["Динамика"]["quest"],
                                 reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
                                     *questions["Динамика"]["buttons"]))
 
-    # Здесь обработчики всех остальных вопросов по образцу но ещё и с проверкой
-    if contin: # Продвижение прогресса пользователя в прогрессе с учётом избегаемых тем
-        users_data[message.from_user.id]["position"] += 1
-        if users_data[message.from_user.id]["position"] == len(questions.keys()) + 1:
-            users_data[message.from_user.id]["position"] = 0
-        elif questions.keys[users_data[message.from_user.id]["position"]] == users_data[message.from_user.id]["ignore"]:
-            users_data[message.from_user.id]["position"] += 1
+    if users_data[message.from_user.id]["position"] == 3:
+        if message.text in questions["Метафора"]["buttons"]:
+            save_ans(users_data[message.from_user.id]["pic_id"], "Метафора", message.text)
+            users_data[message.from_user.id]["position"] = continu(2, users_data[message.from_user.id]["ignore"])
+            # Рестарт опроса *********************************** Необходимо переносить в последний из существующих обработчиков вопросов
+            picker = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            buttons = ["Да", "Нет"]
+            picker.add(*buttons)
+            await message.answer('Спасибо, ваши ответы записаны. Хотите продолжить?', reply_markup=picker)
+            #****************************************************
+        else:
+            await message.answer(questions["Метафора"]["quest"],
+                                reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
+                                    *questions["Метафора"]["buttons"]))
 
 
 
