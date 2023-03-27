@@ -274,6 +274,8 @@ async def send_welcome(message: types.Message):
             picker.add(*buttons)
             # skip = True
             await message.answer('Спасибо, ваши ответы записаны. Хотите продолжить?', reply_markup=picker)
+            users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
+                                                                   users_data[message.from_user.id]["ignore"])
         else:
             skip = True
             await message.answer(questions["Палитра"]["quest"],
