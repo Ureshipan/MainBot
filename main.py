@@ -29,10 +29,10 @@ questions = {
                  "buttons": ["Метафора", "Сетка"]},
     "Фотомонтаж": {"quest": "На данной картине присутствует фотонмонтаж?", "buttons": ["Есть", "Отсутствует"]},
     "Симметрия": {"quest": "На данной картине присутствует симметрия?","buttons": ["Есть","Отсутствует"]},
-    "Контраст_Направлений": {"quest": "На данной картине присутствует контраст направлений?","buttons": ["Есть","Отсутствует"]},
-    "Контраст_Цветов": {"quest": "На данной картине присутствует контраст цветов?","buttons": ["Есть","Отсутствует"]},
-    "Контраст_Форм": {"quest": "На данной картине присутствует контраст форм?","buttons": ["Есть","Отсутствует"]},
-    "Контраст_Размеров": {"quest": "На данной картине присутствует контраст размеров?","buttons": ["Есть","Отсутствует"]},
+    "Контраст Направлений": {"quest": "На данной картине присутствует контраст направлений?","buttons": ["Есть","Отсутствует"]},
+    "Контраст Цветов": {"quest": "На данной картине присутствует контраст цветов?","buttons": ["Есть","Отсутствует"]},
+    "Контраст Форм": {"quest": "На данной картине присутствует контраст форм?","buttons": ["Есть","Отсутствует"]},
+    "Контраст Размеров": {"quest": "На данной картине присутствует контраст размеров?","buttons": ["Есть","Отсутствует"]},
     "Палитра": {"quest": "Какая палитра на данной картине?","buttons": ["Красочная","Монохромная"]},}
 
 
@@ -117,6 +117,7 @@ async def send_welcome(message: types.Message):
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         elif message.text == "Пропустить":
+            await bot.delete_message(message.chat.id, message.message_id)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         else:
@@ -181,8 +182,8 @@ async def send_welcome(message: types.Message):
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
                                      *questions["Симметрия"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 6:
-        if message.text in questions["Контраст_Направлений"]["buttons"]:
-            save_ans(users_data[message.from_user.id]["pic_id"], "Контраст_Направлений", message.text)
+        if message.text in questions["Контраст Направлений"]["buttons"]:
+            save_ans(users_data[message.from_user.id]["pic_id"], "Контраст Направлений", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -191,11 +192,11 @@ async def send_welcome(message: types.Message):
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         else:
-            await message.answer(questions["Контраст_Направлений"]["quest"],
+            await message.answer(questions["Контраст Направлений"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                     *questions["Контраст_Направлений"]["buttons"] + ["Пропустить"]))
+                                     *questions["Контраст Направлений"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 7:
-        if message.text in questions["Контраст_Форм"]["buttons"]:
+        if message.text in questions["Контраст Форм"]["buttons"]:
             save_ans(users_data[message.from_user.id]["pic_id"], "Контраст_Форм", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
@@ -205,12 +206,12 @@ async def send_welcome(message: types.Message):
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         else:
-            await message.answer(questions["Контраст_Форм"]["quest"],
+            await message.answer(questions["Контраст Форм"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                     *questions["Контраст_Форм"]["buttons"] + ["Пропустить"]))
+                                     *questions["Контраст Форм"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 8:
-        if message.text in questions["Контраст_Цветов"]["buttons"]:
-            save_ans(users_data[message.from_user.id]["pic_id"], "Контраст_Цветов", message.text)
+        if message.text in questions["Контраст Цветов"]["buttons"]:
+            save_ans(users_data[message.from_user.id]["pic_id"], "Контраст Цветов", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -219,12 +220,12 @@ async def send_welcome(message: types.Message):
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         else:
-            await message.answer(questions["Контраст_Цветов"]["quest"],
+            await message.answer(questions["Контраст Цветов"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                     *questions["Контраст_Цветов"]["buttons"] + ["Пропустить"]))
+                                     *questions["Контраст Цветов"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 9:
-        if message.text in questions["Контраст_Размеров"]["buttons"]:
-            save_ans(users_data[message.from_user.id]["pic_id"], "Контраст_Размеров", message.text)
+        if message.text in questions["Контраст Размеров"]["buttons"]:
+            save_ans(users_data[message.from_user.id]["pic_id"], "Контраст Размеров", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -233,9 +234,9 @@ async def send_welcome(message: types.Message):
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         else:
-            await message.answer(questions["Контраст_Цветов"]["quest"],
+            await message.answer(questions["Контраст Размеров"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                     *questions["Контраст_Размеров"]["buttons"] + ["Пропустить"]))
+                                     *questions["Контраст Размеров"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 10:
         if message.text in questions["Палитра"]["buttons"]:
             save_ans(users_data[message.from_user.id]["pic_id"], "Палитра", message.text)
