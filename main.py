@@ -25,7 +25,7 @@ questions = {
     "Композиция": {"quest": "На данной картине композиция открытая или закрытая?", "buttons": ["Открытая", "Закрытая"]},
     "Динамика": {"quest": "На данной картине композиция динамическая или статическая?",
                  "buttons": ["Динамическая", "Статическая"]},
-    "Метафоры": {"quest": "На данной картине геометрические фигуры являются метафорой или сеткой?",
+    "Метафора": {"quest": "На данной картине геометрические фигуры являются метафорой или сеткой?",
                  "buttons": ["Метафора", "Сетка"]},
     "Фотомонтаж": {"quest": "На данной картине присутствует фотонмонтаж?", "buttons": ["Есть", "Отсутствует"]},
     "Симметрия": {"quest": "На данной картине присутствует симметрия?","buttons": ["Есть","Отсутствует"]},
@@ -44,6 +44,7 @@ def save_ans(pic_id, param, mean):
 
 
 def continu(pos, ignore):
+    print(pos, end="->")
     pos += 1
     # print(list(questions.keys()), len(list(questions.keys())), pos)
     if pos == len(list(questions.keys())) + 1:
@@ -51,7 +52,7 @@ def continu(pos, ignore):
         # print(pos)
     elif list(questions.keys())[pos - 1] == ignore:
         pos += 1
-    # print(pos)
+    print(pos)
     return pos
 
 
@@ -66,24 +67,33 @@ async def send_welcome(message: types.Message):
     """
     if message.text == "/start":
         if message.from_user.id not in users_data.keys():
-            users_data[message.from_user.id] = {"ignore": "Отвечу на всё", "position": -1, "pic_id": -1,
-                                                "social_rate": 0}
-            # with open('users_data.json') as json_file:
-            # #Добавление юзера в локальный словарь если его нет и перезапись сейва
-            #    json.dump(users_data, json_file)
-            #    json_file.close()
+            users_data[message.from_user.id] = {"ignore": "Отвечу на всё", "qualification": "1-2 курс", "position": -2,
+                                                "pic_id": -1, "social_rate": 0}
         await message.answer("Привет! Это бот Color Study для сбора информации")
 
         await message.answer('Что бы вы хотели сделать?', reply_markup=startkeyboard)
+    elif users_data[message.from_user.id]["position"] == -2 and message.text != '/about':
+        picker = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        # buttons = list(questions.keys()) + ["Отвечу на всё"]
+        buttons = ["1-2 курс", "3-4 курс", "Искуствовед"]
+        picker.add(*buttons)
+        if message.text in buttons:
+            users_data[message.from_user.id]["qualification"] = message.text
+            users_data[message.from_user.id]["position"] = continu(-1, users_data[message.from_user.id]["ignore"])
+        else:
+            await message.answer('Кем вы являетесь на данный момент? (это нужно только для правильной статистики, '
+                                 'полагаемся на вашу честность)', reply_markup=picker)
+
     elif users_data[message.from_user.id]["position"] == -1 and message.text != '/about':
         picker = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        buttons = ['Симметрия', 'Динамика', 'Колористика', 'Отвечу на все']
+        buttons = list(questions.keys()) + ["Отвечу на всё"]
         picker.add(*buttons)
         if message.text in buttons:
             users_data[message.from_user.id]["ignore"] = message.text
             users_data[message.from_user.id]["position"] = continu(-1, users_data[message.from_user.id]["ignore"])
         else:
-            await message.answer('Что бы вы не хотели оценивать?', reply_markup=picker)
+            await message.answer('На вопросы по какой теме вы бы не хотели отвечать? '
+                                 '(в чём не уверены, что можете дать правильный ответ)', reply_markup=picker)
         # return message.text
     elif message.text == '/about':
         await message.answer('*Что-то о Color Study*', reply_markup=startkeyboard)
@@ -105,19 +115,23 @@ async def send_welcome(message: types.Message):
             save_ans(users_data[message.from_user.id]["pic_id"], "Композиция", message.text)
             # contin = True
             users_data[message.from_user.id]["position"] = continu(1, users_data[message.from_user.id]["ignore"])
+        elif message.text == "Пропустить":
+            users_data[message.from_user.id]["position"] = continu(1, users_data[message.from_user.id]["ignore"])
         else:
             await message.answer(questions["Композиция"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                     *questions["Композиция"]["buttons"]))
+                                     *questions["Композиция"]["buttons"] + ["Пропустить"]))
 
     if users_data[message.from_user.id]["position"] == 2:
         if message.text in questions["Динамика"]["buttons"]:
             save_ans(users_data[message.from_user.id]["pic_id"], "Динамика", message.text)
             users_data[message.from_user.id]["position"] = continu(2, users_data[message.from_user.id]["ignore"])
+        elif message.text == "Пропустить":
+            users_data[message.from_user.id]["position"] = continu(1, users_data[message.from_user.id]["ignore"])
         else:
             await message.answer(questions["Динамика"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                     *questions["Динамика"]["buttons"]))
+                                     *questions["Динамика"]["buttons"] + ["Пропустить"]))
 
     if users_data[message.from_user.id]["position"] == 3:
         if message.text in questions["Метафора"]["buttons"]:
@@ -129,10 +143,12 @@ async def send_welcome(message: types.Message):
             picker.add(*buttons)
             await message.answer('Спасибо, ваши ответы записаны. Хотите продолжить?', reply_markup=picker)"""
             # ****************************************************
+        elif message.text == "Пропустить":
+            users_data[message.from_user.id]["position"] = continu(1, users_data[message.from_user.id]["ignore"])
         else:
             await message.answer(questions["Метафора"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                     *questions["Метафора"]["buttons"]))
+                                     *questions["Метафора"]["buttons"] + ["Пропустить"]))
 
     if users_data[message.from_user.id]["position"] == 4:
         if message.text in questions["Фотомонтаж"]["buttons"]:
@@ -140,10 +156,12 @@ async def send_welcome(message: types.Message):
             users_data[message.from_user.id]["position"] = continu(4, users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
             # ****************************************************
+        elif message.text == "Пропустить":
+            users_data[message.from_user.id]["position"] = continu(1, users_data[message.from_user.id]["ignore"])
         else:
             await message.answer(questions["Фотомонтаж"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                     *questions["Фотомонтаж"]["buttons"]))
+                                     *questions["Фотомонтаж"]["buttons"] + ["Пропустить"]))
 
     if users_data[message.from_user.id]["position"] == 5:
         if message.text in questions["Симметрия"]["buttons"]:
@@ -152,50 +170,60 @@ async def send_welcome(message: types.Message):
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
 
             # ****************************************************
+        elif message.text == "Пропустить":
+            users_data[message.from_user.id]["position"] = continu(1, users_data[message.from_user.id]["ignore"])
         else:
             await message.answer(questions["Симметрия"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                     *questions["Симметрия"]["buttons"]))
+                                     *questions["Симметрия"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 6:
         if message.text in questions["Контраст_Направлений"]["buttons"]:
             save_ans(users_data[message.from_user.id]["pic_id"], "Контраст_Направлений", message.text)
             users_data[message.from_user.id]["position"] = continu(6, users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
             # ****************************************************
+        elif message.text == "Пропустить":
+            users_data[message.from_user.id]["position"] = continu(1, users_data[message.from_user.id]["ignore"])
         else:
             await message.answer(questions["Контраст_Направлений"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                     *questions["Контраст_Направлений"]["buttons"]))
+                                     *questions["Контраст_Направлений"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 7:
         if message.text in questions["Контраст_Форм"]["buttons"]:
             save_ans(users_data[message.from_user.id]["pic_id"], "Контраст_Форм", message.text)
             users_data[message.from_user.id]["position"] = continu(7, users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
             # ****************************************************
+        elif message.text == "Пропустить":
+            users_data[message.from_user.id]["position"] = continu(1, users_data[message.from_user.id]["ignore"])
         else:
             await message.answer(questions["Контраст_Форм"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                     *questions["Контраст_Форм"]["buttons"]))
+                                     *questions["Контраст_Форм"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 8:
         if message.text in questions["Контраст_Цветов"]["buttons"]:
             save_ans(users_data[message.from_user.id]["pic_id"], "Контраст_Цветов", message.text)
             users_data[message.from_user.id]["position"] = continu(8, users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
             # ****************************************************
+        elif message.text == "Пропустить":
+            users_data[message.from_user.id]["position"] = continu(1, users_data[message.from_user.id]["ignore"])
         else:
             await message.answer(questions["Контраст_Цветов"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                     *questions["Контраст_Цветов"]["buttons"]))
+                                     *questions["Контраст_Цветов"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 9:
         if message.text in questions["Контраст_Размеров"]["buttons"]:
             save_ans(users_data[message.from_user.id]["pic_id"], "Контраст_Размеров", message.text)
             users_data[message.from_user.id]["position"] = continu(9, users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
             # ****************************************************
+        elif message.text == "Пропустить":
+            users_data[message.from_user.id]["position"] = continu(1, users_data[message.from_user.id]["ignore"])
         else:
             await message.answer(questions["Контраст_Цветов"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                     *questions["Контраст_Размеров"]["buttons"]))
+                                     *questions["Контраст_Размеров"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 10:
         if message.text in questions["Палитра"]["buttons"]:
             save_ans(users_data[message.from_user.id]["pic_id"], "Палитра", message.text)
@@ -206,9 +234,11 @@ async def send_welcome(message: types.Message):
             picker.add(*buttons)
             await message.answer('Спасибо, ваши ответы записаны. Хотите продолжить?', reply_markup=picker)
             # ****************************************************
+        elif message.text == "Пропустить":
+            users_data[message.from_user.id]["position"] = continu(1, users_data[message.from_user.id]["ignore"])
         else:
             await message.answer(questions["Палитра"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
-                                     *questions["Палитра"]["buttons"]))
+                                     *questions["Палитра"]["buttons"] + ["Пропустить"]))
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
