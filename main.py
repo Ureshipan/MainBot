@@ -59,6 +59,7 @@ def continu(pos, ignore):
 @dp.message_handler()
 async def send_welcome(message: types.Message):
     global users_data
+    skip = True
     startkeyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)  # Объявляем варианты ответов для кнопок
     buttons = ['/start_opros', '/about']
     startkeyboard.add(*buttons)  # Заполняем варианты ответов, распаковывая массив с названиями кнопок
@@ -116,11 +117,12 @@ async def send_welcome(message: types.Message):
             # contin = True
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
-        elif message.text == "Пропустить":
-            await bot.delete_message(message.chat.id, message.message_id)
+        elif message.text == "Пропустить" and skip:
+            skip = False
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         else:
+            skip = True
             await message.answer(questions["Композиция"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
                                      *questions["Композиция"]["buttons"] + ["Пропустить"]))
@@ -130,10 +132,12 @@ async def send_welcome(message: types.Message):
             save_ans(users_data[message.from_user.id]["pic_id"], "Динамика", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
-        elif message.text == "Пропустить":
+        elif message.text == "Пропустить" and skip:
+            skip = False
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         else:
+            skip = True
             await message.answer(questions["Динамика"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
                                      *questions["Динамика"]["buttons"] + ["Пропустить"]))
@@ -143,10 +147,12 @@ async def send_welcome(message: types.Message):
             save_ans(users_data[message.from_user.id]["pic_id"], "Метафора", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
-        elif message.text == "Пропустить":
+        elif message.text == "Пропустить" and skip:
+            skip = False
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         else:
+            skip = True
             await message.answer(questions["Метафора"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
                                      *questions["Метафора"]["buttons"] + ["Пропустить"]))
@@ -158,10 +164,12 @@ async def send_welcome(message: types.Message):
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
             # ****************************************************
-        elif message.text == "Пропустить":
+        elif message.text == "Пропустить" and skip:
+            skip = False
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         else:
+            skip = True
             await message.answer(questions["Фотомонтаж"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
                                      *questions["Фотомонтаж"]["buttons"] + ["Пропустить"]))
@@ -174,10 +182,12 @@ async def send_welcome(message: types.Message):
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
 
             # ****************************************************
-        elif message.text == "Пропустить":
+        elif message.text == "Пропустить" and skip:
+            skip = False
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         else:
+            skip = True
             await message.answer(questions["Симметрия"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
                                      *questions["Симметрия"]["buttons"] + ["Пропустить"]))
@@ -188,10 +198,12 @@ async def send_welcome(message: types.Message):
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
             # ****************************************************
-        elif message.text == "Пропустить":
+        elif message.text == "Пропустить" and skip:
+            skip = False
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         else:
+            skip = True
             await message.answer(questions["Контраст Направлений"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
                                      *questions["Контраст Направлений"]["buttons"] + ["Пропустить"]))
@@ -202,10 +214,12 @@ async def send_welcome(message: types.Message):
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
             # ****************************************************
-        elif message.text == "Пропустить":
+        elif message.text == "Пропустить" and skip:
+            skip = False
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         else:
+            skip = True
             await message.answer(questions["Контраст Форм"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
                                      *questions["Контраст Форм"]["buttons"] + ["Пропустить"]))
@@ -216,10 +230,12 @@ async def send_welcome(message: types.Message):
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
             # ****************************************************
-        elif message.text == "Пропустить":
+        elif message.text == "Пропустить" and skip:
+            skip = False
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         else:
+            skip = True
             await message.answer(questions["Контраст Цветов"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
                                      *questions["Контраст Цветов"]["buttons"] + ["Пропустить"]))
@@ -230,10 +246,12 @@ async def send_welcome(message: types.Message):
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
             # ****************************************************
-        elif message.text == "Пропустить":
+        elif message.text == "Пропустить" and skip:
+            skip = False
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         else:
+            skip = True
             await message.answer(questions["Контраст Размеров"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
                                      *questions["Контраст Размеров"]["buttons"] + ["Пропустить"]))
@@ -246,12 +264,18 @@ async def send_welcome(message: types.Message):
             picker = types.ReplyKeyboardMarkup(resize_keyboard=True)
             buttons = ["Да", "Нет"]
             picker.add(*buttons)
+            # skip = True
             await message.answer('Спасибо, ваши ответы записаны. Хотите продолжить?', reply_markup=picker)
             # ****************************************************
-        elif message.text == "Пропустить":
-            users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
-                                                                   users_data[message.from_user.id]["ignore"])
+
+        elif message.text == "Пропустить" and skip:
+            picker = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            buttons = ["Да", "Нет"]
+            picker.add(*buttons)
+            # skip = True
+            await message.answer('Спасибо, ваши ответы записаны. Хотите продолжить?', reply_markup=picker)
         else:
+            skip = True
             await message.answer(questions["Палитра"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
                                      *questions["Палитра"]["buttons"] + ["Пропустить"]))
