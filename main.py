@@ -3,6 +3,7 @@ import os
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types.input_file import InputFile
 import random
+from bd_funcs import *
 
 API_TOKEN = '6159808536:AAHsRPkSlKgsbPmLsTluqxX-hLHICo9p_dA'  # тестить здесь http://t.me/ColorStudyBot
 BASE_PATH = "/home/ureshipan/Yandex.Disk/Color_Study"
@@ -67,9 +68,17 @@ async def send_welcome(message: types.Message):
     This handler will be called when user sends `/start` or `/help` command
     """
     if message.text == "/start":
-        if message.from_user.id not in users_data.keys():
+        if get_user(message.from_user.id) == "No":
             users_data[message.from_user.id] = {"ignore": "Отвечу на всё", "qualification": "1-2 курс", "position": -2,
                                                 "pic_id": -1, "social_rate": 0}
+            new_user(message.from_user.id, 1, "Отвечу на всё")
+        else:
+            data = get_user(message.from_user.id)
+            users_data[message.from_user.id] = {"ignore": data[2],
+                                                "qualification": data[1],
+                                                "position": data[3],
+                                                "pic_id": data[5],
+                                                "social_rate": data[4]}
         await message.answer("Привет! Это бот Color Study для сбора информации")
 
         await message.answer('Что бы вы хотели сделать?', reply_markup=startkeyboard)
@@ -281,5 +290,17 @@ async def send_welcome(message: types.Message):
             await message.answer(questions["Палитра"]["quest"],
                                  reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(
                                      *questions["Палитра"]["buttons"] + ["Пропустить"]))
+
+
+def control():
+    while True:
+        command = input()
+        if command == "Save":
+            print("saving...")
+            for user_id in users_data.keys():
+                update_pos(user_id, users_data[user_id]["position"])
+            print("done!")
+
+
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
