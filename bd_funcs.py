@@ -3,7 +3,7 @@ import sqlite3
 
 bd_name = "Color_Study(UpdateV2.3).db"
 
-#cur.execute("""SELECT ID FROM Date WHERE Date=?""",(year, )
+#cur.execute("""SELECT ID FROM Date WHERE Date=?""",(year, ).
 def Pictures(Author, year, name):
     conn = sqlite3.connect(bd_name)
     cur = conn.cursor()
