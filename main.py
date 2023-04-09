@@ -305,7 +305,7 @@ async def send_welcome(message: types.Message):
             # skip = True
             await message.answer('Спасибо, ваши ответы записаны. Хотите продолжить?', reply_markup=picker)
             ResultUserOpros(message.from_user.id, Compos, Dinam, Simm, Metaf, Photos, ContrastA, ContrastB, ContrastC,
-                            ContrastD, Poll) #Функция, которая записывает наши ответы.
+                            ContrastD, Poll) #Функция, которая записывает наши ответы
             # ****************************************************
 
         elif message.text == "Пропустить" and skip:
