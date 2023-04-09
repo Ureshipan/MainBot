@@ -38,10 +38,38 @@ questions = {
 
 
 # Пример функции, которая обрабатывает команды
-
-
+#Это временные переменные, которые идут в БД
+Dinam = ""
+Metaf = ""
+Photos = ""
+Simm = ""
+ContrastA = ""
+ContrastB = ""
+ContrastC = ""
+ContrastD = ""
+Poll = ""
+Compos = "Закрытая"
+#Дополнил тем, что в зависимости от шага, временные данные меняются
 def save_ans(pic_id, param, mean):
     print(pic_id, param, mean)
+    if(pic_id == 2):
+        Dinam = mean
+    elif(pic_id == 3):
+        Metaf = mean
+    elif(pic_id == 4):
+        Photos = 0
+    elif(pic_id == 5):
+        Simm = 0
+    elif(pic_id == 6):
+        ContrastA = 0
+    elif(pic_id == 7):
+        ContrastB = 0
+    elif (pic_id == 8):
+        ContrastC = 0
+    elif(pic_id == 9):
+        ContrastD = 0
+    elif (pic_id == 10):
+        Poll = 0
 
 
 def continu(pos, ignore):
@@ -116,6 +144,7 @@ async def send_welcome(message: types.Message):
             'test_images/' + random.choice([x for x in os.scandir("test_images/") if os.path.isfile(x)]).name)
         # contin = True
         users_data[message.from_user.id]["position"] = continu(0, users_data[message.from_user.id]["ignore"])
+        Pictures("Капитошка", 2020, pic.get_filename()) #А это запись картин в БД
         await message.answer_photo(photo=pic, caption="Автор, название, год")
 
         # await message.reply(random.choice([x for x in os.scandir("test_images/")if os.path.isfile(x)]).name)
@@ -275,6 +304,8 @@ async def send_welcome(message: types.Message):
             picker.add(*buttons)
             # skip = True
             await message.answer('Спасибо, ваши ответы записаны. Хотите продолжить?', reply_markup=picker)
+            ResultUserOpros(message.from_user.id, Compos, Dinam, Simm, Metaf, Photos, ContrastA, ContrastB, ContrastC,
+                            ContrastD, Poll) #Функция, которая записывает наши ответы
             # ****************************************************
 
         elif message.text == "Пропустить" and skip:
