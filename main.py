@@ -144,14 +144,12 @@ async def send_welcome(message: types.Message):
             'test_images/' + random.choice([x for x in os.scandir("test_images/") if os.path.isfile(x)]).name)
         # contin = True
         users_data[message.from_user.id]["position"] = continu(0, users_data[message.from_user.id]["ignore"])
-        Pictures("Капитошка", 2020, pic.get_filename()) #А это запись картин в БД
         await message.answer_photo(photo=pic, caption="Автор, название, год")
 
         # await message.reply(random.choice([x for x in os.scandir("test_images/")if os.path.isfile(x)]).name)
 
     if users_data[message.from_user.id]["position"] == 1:
         if message.text in questions["Композиция"]["buttons"]:
-            save_ans(users_data[message.from_user.id]["pic_id"], "Композиция", message.text)
             # contin = True
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
@@ -167,7 +165,6 @@ async def send_welcome(message: types.Message):
 
     if users_data[message.from_user.id]["position"] == 2:
         if message.text in questions["Динамика"]["buttons"]:
-            save_ans(users_data[message.from_user.id]["pic_id"], "Динамика", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         elif message.text == "Пропустить" and skip:
@@ -182,7 +179,6 @@ async def send_welcome(message: types.Message):
 
     if users_data[message.from_user.id]["position"] == 3:
         if message.text in questions["Метафора"]["buttons"]:
-            save_ans(users_data[message.from_user.id]["pic_id"], "Метафора", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         elif message.text == "Пропустить" and skip:
@@ -197,7 +193,6 @@ async def send_welcome(message: types.Message):
 
     if users_data[message.from_user.id]["position"] == 4:
         if message.text in questions["Фотомонтаж"]["buttons"]:
-            save_ans(users_data[message.from_user.id]["pic_id"], "Фотомонтаж", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -214,7 +209,6 @@ async def send_welcome(message: types.Message):
 
     if users_data[message.from_user.id]["position"] == 5:
         if message.text in questions["Симметрия"]["buttons"]:
-            save_ans(users_data[message.from_user.id]["pic_id"], "Симметрия", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -231,7 +225,6 @@ async def send_welcome(message: types.Message):
                                      *questions["Симметрия"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 6:
         if message.text in questions["Контраст Направлений"]["buttons"]:
-            save_ans(users_data[message.from_user.id]["pic_id"], "Контраст Направлений", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -247,7 +240,6 @@ async def send_welcome(message: types.Message):
                                      *questions["Контраст Направлений"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 7:
         if message.text in questions["Контраст Форм"]["buttons"]:
-            save_ans(users_data[message.from_user.id]["pic_id"], "Контраст_Форм", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -263,7 +255,6 @@ async def send_welcome(message: types.Message):
                                      *questions["Контраст Форм"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 8:
         if message.text in questions["Контраст Цветов"]["buttons"]:
-            save_ans(users_data[message.from_user.id]["pic_id"], "Контраст Цветов", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -279,7 +270,6 @@ async def send_welcome(message: types.Message):
                                      *questions["Контраст Цветов"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 9:
         if message.text in questions["Контраст Размеров"]["buttons"]:
-            save_ans(users_data[message.from_user.id]["pic_id"], "Контраст Размеров", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -295,7 +285,6 @@ async def send_welcome(message: types.Message):
                                      *questions["Контраст Размеров"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 10:
         if message.text in questions["Палитра"]["buttons"]:
-            save_ans(users_data[message.from_user.id]["pic_id"], "Палитра", message.text)
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
