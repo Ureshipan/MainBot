@@ -3,26 +3,21 @@ import sqlite3
 
 bd_name = "Color_Study(UpdateV2.3).db"
 
-#cur.execute("""SELECT ID FROM Date WHERE Date=?""",(year, )
-def Pictures(Author, year, name):
+
+def get_next_pic(userid):
     conn = sqlite3.connect(bd_name)
     cur = conn.cursor()
-    try:
-        cur.execute("""INSERT INTO Authors (Autor) VALUES (?);""", (Author, ))
-    except sqlite3.Error as e:
-        print("Ошибка при записи в SQLite", e)
-    try:
-        cur.execute("""INSERT INTO Date (Date) VALUES (?);""", (year, ))
-    except sqlite3.Error as e:
-        print("Ошибка при записи в SQLite", e)
-    cur.execute("""SELECT * FROM Authors WHERE Autor = ?;""", [Author])
-    aut = cur.fetchone()[0]
-    cur.execute("""SELECT * FROM Date WHERE Date = ?;""", [year])
-    dat = cur.fetchone()[0]
-    cur.execute("""INSERT INTO Pictures (IDAuthor, Name, IDDate, Ratio, ImageSource) VALUES (?,?,?,?,?);""", (aut,name, dat, 1,name ))
-    conn.commit()
-    conn.close()
-    return "done"
+    cur.execute("""SELECT ID, IDUsers FROM UsersResult WHERE IDUsers = ?;""", [userid])
+    ids = cur.fetchall()
+    for i in range(len(ids)):
+        ids[i] = ids[i][0]
+    cur.executemany("""SELECT IDPictures, IDResult FROM MainTable WHERE IDResult = ?;""", [ids])
+    picids = cur.fetchall()
+    for i in range(len(picids)):
+        picids[i] = picids[i][0]
+    cur.executemany("""SELECT ID FROM Pictures WHERE ID != ?;""", [picids])
+    picid = cur.fetchone()
+    return picid
 
 def ResultUserOpros(IDUser, Composition, Status,Simmetria, Geometry, Photo_Montage, direction, size, color, form, Pallette):
     conn = sqlite3.connect(bd_name)
