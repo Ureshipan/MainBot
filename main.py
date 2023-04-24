@@ -28,13 +28,13 @@ questions = {
                  "buttons": ["Динамическая", "Статическая"]},
     "Метафора": {"quest": "На данной картине геометрические фигуры являются метафорой или сеткой?",
                  "buttons": ["Метафора", "Сетка"]},
-    "Фотомонтаж": {"quest": "На данной картине присутствует фотонмонтаж?", "buttons": ["Есть", "Отсутствует"]},
+    "Фотомонтаж": {"quest": "На данной картине присутствует фотомонтаж?", "buttons": ["Есть", "Отсутствует"]},
     "Симметрия": {"quest": "На данной картине присутствует симметрия?","buttons": ["Есть","Отсутствует"]},
     "Контраст Направлений": {"quest": "На данной картине присутствует контраст направлений?","buttons": ["Есть","Отсутствует"]},
     "Контраст Цветов": {"quest": "На данной картине присутствует контраст цветов?","buttons": ["Есть","Отсутствует"]},
     "Контраст Форм": {"quest": "На данной картине присутствует контраст форм?","buttons": ["Есть","Отсутствует"]},
     "Контраст Размеров": {"quest": "На данной картине присутствует контраст размеров?","buttons": ["Есть","Отсутствует"]},
-    "Палитра": {"quest": "Какая палитра на данной картине?","buttons": ["Красочная","Монохромная"]},}
+    "Палитра": {"quest": "Какая палитра на данной картине?","buttons": ["Контрастная","Монохромная"]}}
 
 
 # Пример функции, которая обрабатывает команды
@@ -89,6 +89,7 @@ def continu(pos, ignore):
 async def send_welcome(message: types.Message):
     global users_data
     skip = True
+    boolans = 0
     startkeyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)  # Объявляем варианты ответов для кнопок
     buttons = ['/start_opros', '/about']
     startkeyboard.add(*buttons)  # Заполняем варианты ответов, распаковывая массив с названиями кнопок
@@ -98,14 +99,24 @@ async def send_welcome(message: types.Message):
     if message.text == "/start":
         if get_user(message.from_user.id) == "No":
             users_data[message.from_user.id] = {"ignore": "Отвечу на всё", "qualification": "1-2 курс", "position": -2,
-                                                "pic_id": -1, "social_rate": 0}
+                                                "pic_id": -1, "social_rate": 0, "answers": {"Композиция": 2,
+                                                                                            "Динамика": 2,
+                                                                                            "Метафора": 2,
+                                                                                            "Фотомонтаж": 2,
+                                                                                            "Симметрия": 2,
+                                                                                            "Контраст Направлений": 2,
+                                                                                            "Контраст Цветов": 2,
+                                                                                            "Контраст Форм": 2,
+                                                                                            "Контраст Размеров": 2,
+                                                                                            "Палитра": 2}
+                                                }
             new_user(message.from_user.id, 1, "Отвечу на всё")
         else:
             data = get_user(message.from_user.id)
             users_data[message.from_user.id] = {"ignore": data[2],
                                                 "qualification": data[1],
                                                 "position": data[3],
-                                                "pic_id": data[5],
+                                                "pic_id": -1,
                                                 "social_rate": data[4]}
         await message.answer("Привет! Это бот Color Study для сбора информации")
 
@@ -144,13 +155,20 @@ async def send_welcome(message: types.Message):
             'test_images/' + random.choice([x for x in os.scandir("test_images/") if os.path.isfile(x)]).name)
         # contin = True
         users_data[message.from_user.id]["position"] = continu(0, users_data[message.from_user.id]["ignore"])
-        await message.answer_photo(photo=pic, caption="Автор, название, год")
+        pic = get_next_pic(message.from_user.id)
+        users_data[message.from_user.id]["pic_id"] = pic[0]
+        await message.answer_photo(photo=pic[-1], caption=pic[1]+" \""+pic[2]+"\" "+str(pic[3]))
 
         # await message.reply(random.choice([x for x in os.scandir("test_images/")if os.path.isfile(x)]).name)
 
     if users_data[message.from_user.id]["position"] == 1:
         if message.text in questions["Композиция"]["buttons"]:
             # contin = True
+            if message.text == "Открытая":
+                boolans = 1
+            else:
+                boolans = 0
+            users_data[message.from_user.id]["answers"]["Композиция"] = boolans
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         elif message.text == "Пропустить" and skip:
@@ -165,6 +183,11 @@ async def send_welcome(message: types.Message):
 
     if users_data[message.from_user.id]["position"] == 2:
         if message.text in questions["Динамика"]["buttons"]:
+            if message.text == "Динамическая":
+                boolans = 1
+            else:
+                boolans = 0
+            users_data[message.from_user.id]["answers"]["Динамика"] = boolans
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         elif message.text == "Пропустить" and skip:
@@ -179,6 +202,11 @@ async def send_welcome(message: types.Message):
 
     if users_data[message.from_user.id]["position"] == 3:
         if message.text in questions["Метафора"]["buttons"]:
+            if message.text == "Метафора":
+                boolans = 1
+            else:
+                boolans = 0
+            users_data[message.from_user.id]["answers"]["Метафора"] = boolans
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
         elif message.text == "Пропустить" and skip:
@@ -193,6 +221,11 @@ async def send_welcome(message: types.Message):
 
     if users_data[message.from_user.id]["position"] == 4:
         if message.text in questions["Фотомонтаж"]["buttons"]:
+            if message.text == "Есть":
+                boolans = 1
+            else:
+                boolans = 0
+            users_data[message.from_user.id]["answers"]["Фотомонтаж"] = boolans
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -209,6 +242,11 @@ async def send_welcome(message: types.Message):
 
     if users_data[message.from_user.id]["position"] == 5:
         if message.text in questions["Симметрия"]["buttons"]:
+            if message.text == "Есть":
+                boolans = 1
+            else:
+                boolans = 0
+            users_data[message.from_user.id]["answers"]["Симметрия"] = boolans
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -225,6 +263,11 @@ async def send_welcome(message: types.Message):
                                      *questions["Симметрия"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 6:
         if message.text in questions["Контраст Направлений"]["buttons"]:
+            if message.text == "Есть":
+                boolans = 1
+            else:
+                boolans = 0
+            users_data[message.from_user.id]["answers"]["Контраст Направлений"] = boolans
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -240,6 +283,11 @@ async def send_welcome(message: types.Message):
                                      *questions["Контраст Направлений"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 7:
         if message.text in questions["Контраст Форм"]["buttons"]:
+            if message.text == "Есть":
+                boolans = 1
+            else:
+                boolans = 0
+            users_data[message.from_user.id]["answers"]["Контраст Форм"] = boolans
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -255,6 +303,11 @@ async def send_welcome(message: types.Message):
                                      *questions["Контраст Форм"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 8:
         if message.text in questions["Контраст Цветов"]["buttons"]:
+            if message.text == "Есть":
+                boolans = 1
+            else:
+                boolans = 0
+            users_data[message.from_user.id]["answers"]["Контраст Цветов"] = boolans
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -270,6 +323,11 @@ async def send_welcome(message: types.Message):
                                      *questions["Контраст Цветов"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 9:
         if message.text in questions["Контраст Размеров"]["buttons"]:
+            if message.text == "Есть":
+                boolans = 1
+            else:
+                boolans = 0
+            users_data[message.from_user.id]["answers"]["Контраст Размеров"] = boolans
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -285,6 +343,11 @@ async def send_welcome(message: types.Message):
                                      *questions["Контраст Размеров"]["buttons"] + ["Пропустить"]))
     if users_data[message.from_user.id]["position"] == 10:
         if message.text in questions["Палитра"]["buttons"]:
+            if message.text == "Контрастная":
+                boolans = 1
+            else:
+                boolans = 0
+            users_data[message.from_user.id]["answers"]["Палитра"] = boolans
             users_data[message.from_user.id]["position"] = continu(users_data[message.from_user.id]["position"],
                                                                    users_data[message.from_user.id]["ignore"])
             # Рестарт опроса ******************* Необходимо переносить в последний из существующих обработчиков вопросов
@@ -293,8 +356,7 @@ async def send_welcome(message: types.Message):
             picker.add(*buttons)
             # skip = True
             await message.answer('Спасибо, ваши ответы записаны. Хотите продолжить?', reply_markup=picker)
-            ResultUserOpros(message.from_user.id, Compos, Dinam, Simm, Metaf, Photos, ContrastA, ContrastB, ContrastC,
-                            ContrastD, Poll) #Функция, которая записывает наши ответы
+            ResultUserOpros(message.from_user.id, users_data[message.from_user.id]["pic_id"], users_data[message.from_user.id]["answers"]) #Функция, которая записывает наши ответы
             # ****************************************************
 
         elif message.text == "Пропустить" and skip:
