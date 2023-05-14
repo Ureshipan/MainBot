@@ -117,7 +117,8 @@ async def send_welcome(message: types.Message):
                                                 "qualification": data[1],
                                                 "position": data[3],
                                                 "pic_id": -1,
-                                                "social_rate": data[4]}
+                                                "social_rate": data[4],
+                                                "answers": {}}
         await message.answer("Привет! Это бот Color Study для сбора информации")
 
         await message.answer('Что бы вы хотели сделать?', reply_markup=startkeyboard)
