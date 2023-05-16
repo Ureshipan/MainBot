@@ -91,7 +91,7 @@ async def send_welcome(message: types.Message):
     skip = True
     boolans = 0
     startkeyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)  # Объявляем варианты ответов для кнопок
-    buttons = ['/start_opros', '/about']
+    buttons = ['Начать опрос', 'О проекте']
     startkeyboard.add(*buttons)  # Заполняем варианты ответов, распаковывая массив с названиями кнопок
     """
     This handler will be called when user sends `/start` or `/help` command
@@ -122,7 +122,7 @@ async def send_welcome(message: types.Message):
         await message.answer("Привет! Это бот Color Study для сбора информации")
 
         await message.answer('Что бы вы хотели сделать?', reply_markup=startkeyboard)
-    elif users_data[message.from_user.id]["position"] == -2 and message.text != '/about':
+    elif users_data[message.from_user.id]["position"] == -2 and message.text != 'О проекте':
         picker = types.ReplyKeyboardMarkup(resize_keyboard=True)
         # buttons = list(questions.keys()) + ["Отвечу на всё"]
         buttons = ["1-2 курс", "3-4 курс", "Искуствовед"]
@@ -134,7 +134,7 @@ async def send_welcome(message: types.Message):
             await message.answer('Кем вы являетесь на данный момент? (это нужно только для правильной статистики, '
                                  'полагаемся на вашу честность)', reply_markup=picker)
 
-    if users_data[message.from_user.id]["position"] == -1 and message.text != '/about':
+    if users_data[message.from_user.id]["position"] == -1 and message.text != 'О проекте':
         picker = types.ReplyKeyboardMarkup(resize_keyboard=True)
         buttons = list(questions.keys()) + ["Отвечу на всё"]
         picker.add(*buttons)
@@ -145,7 +145,7 @@ async def send_welcome(message: types.Message):
             await message.answer('На вопросы по какой теме вы бы не хотели отвечать? '
                                  '(в чём не уверены, что можете дать правильный ответ)', reply_markup=picker)
         # return message.text
-    elif message.text == '/about':
+    elif message.text == 'О проекте':
         await message.answer('*Что-то о Color Study*', reply_markup=startkeyboard)
 
     # Отправка изображения и первый вопрос юзеру. В обработчике следующего вопроса нужно сделать проверку
